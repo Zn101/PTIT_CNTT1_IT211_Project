@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import project.coursemanagement.enums.RoleEnum;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -24,9 +27,24 @@ public class User {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private RoleEnum role;
 
     @Column(nullable = false)
     private Boolean isActive;
+
+    @Column(length = 100)
+    private String resetToken;
+
+    @Column
+    private LocalDateTime resetTokenExpiry;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TokenBlacklist> tokenBlacklists;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Submission> submissions;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Enrollment> enrollments;
 }
