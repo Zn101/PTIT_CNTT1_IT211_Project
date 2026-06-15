@@ -1,9 +1,12 @@
 package project.coursemanagement.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.coursemanagement.dto.response.LectureMaterialResponse;
+import project.coursemanagement.dto.response.PageResponse;
 import project.coursemanagement.entity.Course;
 import project.coursemanagement.entity.LectureMaterial;
 import project.coursemanagement.exception.ResourceNotFoundException;
@@ -43,14 +46,26 @@ public class LectureMaterialServiceImpl implements LectureMaterialService {
     }
 
     @Override
-    public List<LectureMaterialResponse> getMaterialsByCourse(Long courseId) {
+    public PageResponse<LectureMaterialResponse> getMaterialsByCourse(Long courseId, int page, int size) {
         if (!courseRepository.existsById(courseId)) {
             throw new ResourceNotFoundException("Course not found with id: " + courseId);
         }
 
-        return lectureMaterialRepository.findByCourseId(courseId)
+        Page<LectureMaterial> materialPage = lectureMaterialRepository
+                .findByCourseId(courseId, PageRequest.of(page, size));
+
+        List<LectureMaterialResponse> responses = materialPage.getContent()
                 .stream()
                 .map(LectureMaterialMapper::toResponse)
                 .toList();
+
+        return PageResponse.<LectureMaterialResponse>builder()
+                .content(responses)
+                .page(materialPage.getNumber())
+                .size(materialPage.getSize())
+                .totalElements(materialPage.getTotalElements())
+                .totalPages(materialPage.getTotalPages())
+                .last(materialPage.isLast())
+                .build();
     }
 }

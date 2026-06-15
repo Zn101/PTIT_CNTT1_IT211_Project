@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.coursemanagement.dto.request.GradeSubmissionRequest;
 import project.coursemanagement.dto.response.LectureMaterialResponse;
+import project.coursemanagement.dto.response.PageResponse;
 import project.coursemanagement.dto.response.SubmissionResponse;
 import project.coursemanagement.entity.User;
 import project.coursemanagement.service.LectureMaterialService;
 import project.coursemanagement.service.SubmissionService;
 import project.coursemanagement.service.UserSecurityService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/lecturer")
@@ -46,9 +45,11 @@ public class LecturerController {
     }
 
     @GetMapping("/courses/{courseId}/materials")
-    public ResponseEntity<List<LectureMaterialResponse>> getMaterials(
-            @PathVariable Long courseId
+    public ResponseEntity<PageResponse<LectureMaterialResponse>> getMaterials(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok(lectureMaterialService.getMaterialsByCourse(courseId));
+        return ResponseEntity.ok(lectureMaterialService.getMaterialsByCourse(courseId, page, size));
     }
 }

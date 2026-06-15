@@ -6,7 +6,9 @@ import project.coursemanagement.dto.response.EnrollmentResponse;
 import project.coursemanagement.entity.Course;
 import project.coursemanagement.entity.Enrollment;
 import project.coursemanagement.entity.User;
+import project.coursemanagement.enums.RoleEnum;
 import project.coursemanagement.exception.DuplicateResourceException;
+import project.coursemanagement.exception.InvalidStateException;
 import project.coursemanagement.exception.ResourceNotFoundException;
 import project.coursemanagement.mapper.EnrollmentMapper;
 import project.coursemanagement.repository.CourseRepository;
@@ -25,7 +27,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public EnrollmentResponse enroll(Long studentId, Long courseId) {
         User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + studentId));
+
+        if (student.getRole() != RoleEnum.STUDENT) {
+            throw new InvalidStateException("Only students can enroll in courses");
+        }
+
+        if (!student.getIsActive()) {
+            throw new InvalidStateException("Cannot enroll an inactive user");
+        }
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
@@ -40,5 +50,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .build();
 
         return EnrollmentMapper.toResponse(enrollmentRepository.save(enrollment));
+    }
+
+    @Override
+    public boolean isEnrolled(Long studentId, Long courseId) {
+        return enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
     }
 }

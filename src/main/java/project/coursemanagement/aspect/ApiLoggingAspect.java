@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ApiLoggingAspect {
-
     @Around("execution(* project.coursemanagement.service.impl.*.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();

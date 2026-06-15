@@ -14,7 +14,6 @@ import project.coursemanagement.dto.response.PageResponse;
 import project.coursemanagement.security.JwtAuthenticationFilter;
 import project.coursemanagement.security.JwtService;
 import project.coursemanagement.service.CourseService;
-import project.coursemanagement.service.UserService;
 
 import java.util.List;
 
@@ -24,16 +23,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(AdminCourseController.class)
 class AdminControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     private final JsonMapper jsonMapper = JsonMapper.builder().build();
-
-    @MockitoBean
-    private UserService userService;
 
     @MockitoBean
     private CourseService courseService;
